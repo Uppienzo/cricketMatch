@@ -64,7 +64,7 @@ app.put("/players/:playerId/", async (request, response) => {
 app.get("/matches/:matchId/", async (request, response) => {
   const { matchId } = request.params;
   const sqlGetQuery = `
-    SELECT match_id AS matchID,
+    SELECT match_id AS matchId,
            match,
            year 
     FROM match_details
@@ -77,7 +77,7 @@ app.get("/matches/:matchId/", async (request, response) => {
 app.get("/players/:playerId/matches/", async (request, response) => {
   const { playerId } = request.params;
   const sqlQuery = `
-    SELECT match_id AS matchID,
+    SELECT match_id AS matchId,
            match,
            year 
     FROM player_details NATURAL JOIN match_details
