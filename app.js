@@ -80,7 +80,7 @@ app.get("/players/:playerId/matches/", async (request, response) => {
     SELECT match_id AS matchId,
            match,
            year 
-    FROM player_details NATURAL JOIN match_details
+    FROM player_match_score NATURAL JOIN match_details
     WHERE player_id = '${playerId}';    `;
   const dbResponse = await db.all(sqlQuery);
   response.send(dbResponse);
@@ -101,20 +101,18 @@ app.get("/matches/:matchId/players/", async (request, response) => {
 
 app.get("/players/:playerId/playerScores/", async (request, response) => {
   const { playerId } = request.params;
-  console.log(playerId);
-  const sqlQuery = `
-  SELECT 
-        player_id as PlayerId,
-        player_name as playerName,
-         sum(score) as totalScore,
-        sum(fours) as totalFours,
-        sum(sixes) as totalSixes
-  FROM player_match_score NATURAL JOIN player_details
-  WHERE player_id = '${playerId}'
-  GROUP BY player_id;  `;
-  const dbResponse = await db.all(sqlQuery);
-  response.send(dbResponse[0]);
-  console.log(dbResponse[0]);
+  const playerStats = `
+    SELECT player_details.player_id AS playerId,
+    player_details.player_name as playerName,
+    SUM(player_match_score.score) as totalScore,
+    SUM(player_match_score.fours) as totalFours,
+    SUM(player_match_score.sixes) as totalSixes
+    FROM player_match_score INNER JOIN player_details
+    WHERE player_details.player_id = '${playerId}'
+     GROUP BY player_match_score.player_id;
+    `;
+  const stat = await db.get(playerStats);
+  response.send(stat);
+  console.log(stat);
 });
-
 module.exports = app;
